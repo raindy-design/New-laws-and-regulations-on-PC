@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>法律法规库 - PC首页</title>
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --line: #e7edf5;
+      --text: #1f2a37;
+      --muted: #667085;
+      --primary: #1677ff;
+      --primary-deep: #0f5ed7;
+      --teal: #14b8a6;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "PingFang SC", "Microsoft YaHei", sans-serif; background: #eef2f7; color: var(--text); }
+    .app { min-width: 1440px; }
+
+    /* ---- 整体布局：顶部导航 + 左侧菜单 + 主内容 ---- */
+    .app-layout {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* ---- 顶部一级导航（深蓝色） ---- */
+    .topbar {
+      height: 56px;
+      background: #1f3a8a;
+      display: flex; align-items: center;
+      padding: 0 0; position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(26,54,93,.25);
+      min-width: 1440px;
+    }
+
+    /* Logo */
+    .brand { display: flex; align-items: center; gap: 10px; padding: 0 20px 0 16px; }
+    .brand-icon {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: #fff; display: flex; align-items: center; justify-content: center;
+    }
+    .brand-icon svg { width: 20px; height: 20px; }
+    .brand-name { font-size: 16px; font-weight: 600; color: #fff; margin: 0; }
+
+    /* 一级菜单 */
+    .top-nav { display: flex; align-items: center; flex: 1; margin-left: 8px; }
+    .nav-item {
+      height: 56px; padding: 0 16px; display: flex; align-items: center;
+      gap: 7px; color: rgba(255,255,255,.8); font-size: 13px;
+      text-decoration: none; transition: .15s; position: relative;
+      border-radius: 8px; margin: 0 2px;
+    }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,.1); }
+    .nav-item.active {
+      color: #fff; background: #3b82f6;
+    }
+    .nav-item-icon { font-size: 15px; width: 18px; text-align: center; }
+    .nav-item-text { font-weight: 500; }
+
+    .top-actions { display: flex; align-items: center; gap: 10px; padding: 0 20px 0 0; }
+    .top-user {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 12px 6px 6px; border-radius: 24px;
+      background: rgba(255,255,255,.12); cursor: pointer; transition: .15s;
+    }
+    .top-user:hover { background: rgba(255,255,255,.2); }
+    .top-user-avatar {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: #60a5fa; display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 11px; font-weight: 700;
+    }
+    .top-user-name { font-size: 12px; color: #fff; font-weight: 500; }
+
+    /* ---- 主容器：左侧菜单 + 右侧内容 ---- */
+    .main-container {
+      display: flex; flex: 1;
+    }
+
+    /* 左侧二级菜单 */
+    .sidebar {
+      width: 200px; background: #fff;
+      border-right: 1px solid #e2e8f0;
+      padding: 0; flex-shrink: 0;
+    }
+    .menu-group { }
+    .menu-title {
+      padding: 16px 16px 12px;
+      font-size: 14px; font-weight: 600;
+      color: #1f2a37; text-transform: none; letter-spacing: 0;
+    }
+    .menu-item {
+      display: flex; align-items: center; gap: 10px;
+      margin: 0 8px 2px;
+      padding: 10px 12px; font-size: 13px; color: #475569;
+      text-decoration: none; transition: .15s; cursor: pointer;
+      border-left: 3px solid transparent;
+      border-radius: 6px;
+    }
+    .menu-item:hover { background: #f8fafc; color: #344054; }
+    .menu-item.active {
+      background: #eff6ff; color: #1d4ed8;
+      border-left-color: #3b82f6; font-weight: 600; padding-left: 9px;
+    }
+    .menu-item-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    /* ---- 右侧主内容区 ---- */
+    .content-wrapper {
+      flex: 1; padding: 20px 24px; overflow-y: auto;
+    }
+
+    /* ---- Layout ---- */
+    .layout { display: flex; flex-direction: column; gap: 16px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); }
+
+    /* ---- Hero 三列布局 ---- */
+    .hero {
+      padding: 20px 28px;
+      background:
+        radial-gradient(circle at top right, rgba(20,184,166,.18), transparent 30%),
+        radial-gradient(circle at left bottom, rgba(255,255,255,.14), transparent 28%),
+        linear-gradient(135deg, #0f6cbd, #1484d6 55%, #19a7ce);
+      color: #fff; overflow: hidden; position: relative;
+      display: grid;
+      grid-template-columns: 1.3fr 1fr 1.3fr;
+      gap: 18px;
+      align-items: stretch; /* 改为拉伸对齐 */
+      min-height: 280px; /* 固定最小高度 */
+    }
+    .hero::before {
+      content: ""; position: absolute; inset: -60px auto auto -40px;
+      width: 240px; height: 240px; border-radius: 50%;
+      background: rgba(255,255,255,.05); pointer-events: none;
+    }
+    .hero::after {
+      content: ""; position: absolute; inset: auto -60px -80px auto;
+      width: 280px; height: 280px; border-radius: 50%;
+      background: rgba(255,255,255,.07); pointer-events: none;
+    }
+
+    /* 三列通用标题 */
+    .hero-col-title {
+      margin: 0 0 8px; font-size: 17px; font-weight: 600; color: #fff;
+    }
+
+    /* 左列：更新提醒 */
+    .hero-left-col {
+      display: flex; flex-direction: column; gap: 0;
+      position: relative; z-index: 1;
+    }
+    .hero-update {
+      flex: 1;
+      padding: 18px 20px; border-radius: 14px;
+      background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.16);
+      backdrop-filter: blur(8px); display: flex; flex-direction: column;
+      gap: 10px;
+    }
+    .hero-update-header {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .hero-update-icon {
+      width: 32px; height: 32px; border-radius: 10px;
+      background: rgba(255,255,255,.2); display: grid; place-items: center;
+      font-size: 16px; color: #fff; flex-shrink: 0;
+    }
+    .hero-update-text { flex: 1; }
+    .hero-update h4 { margin: 0 0 4px; font-size: 16px; font-weight: 600; color: #fff; }
+    .hero-update p  { margin: 0; font-size: 14px; color: rgba(255,255,255,.85); line-height: 1.5; }
+    .hero-update .ghost-btn {
+      align-self: flex-start; background: rgba(255,255,255,.22); color: #fff;
+      border: 1px solid rgba(255,255,255,.25); font-size: 13px; padding: 8px 16px;
+      white-space: nowrap;
+    }
+
+    /* 中列：3个统计数字（横向并排） */
+    .hero-middle-col {
+      display: flex; flex-direction: column; gap: 0;
+      position: relative; z-index: 1;
+    }
+    .stats-row {
+      display: flex; gap: 10px;
+      flex: 1;
+    }
+    .stat-tile-icon-horizontal {
+      flex: 1; min-height: 0;
+      padding: 12px 10px; border-radius: 12px;
+      background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.16);
+      backdrop-filter: blur(8px); display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 6px;
+    }
+    .stat-icon {
+      width: 36px; height: 36px; display: grid; place-items: center;
+      font-size: 24px; flex-shrink: 0;
+    }
+    .stat-tile-icon-horizontal span   { font-size: 12px; color: rgba(255,255,255,.8); }
+    .stat-tile-icon-horizontal strong { font-size: 22px; font-weight: 700; line-height: 1; }
+
+    /* 右列：快捷入口 */
+    .hero-right-col {
+      display: flex; flex-direction: column; gap: 8px;
+      position: relative; z-index: 1;
+    }
+    .hero-quick-grid {
+      display: grid; grid-template-columns: repeat(2,1fr); gap: 8px;
+      flex: 1;
+    }
+    .hero-quick-item {
+      padding: 10px 12px; border-radius: 10px;
+      background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(6px); cursor: pointer; transition: .2s;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .hero-quick-item:hover { background: rgba(255,255,255,.16); }
+    .hero-quick-icon {
+      width: 34px; height: 34px; border-radius: 8px;
+      display: grid; place-items: center; color: #fff; font-size: 14px;
+      flex-shrink: 0;
+    }
+    .hero-quick-text { flex: 1; min-width: 0; }
+    .hero-quick-text h4 { margin: 0; font-size: 13px; font-weight: 600; color: #fff; }
+    .hero-quick-text p  { margin: 0; font-size: 11px; color: rgba(255,255,255,.7); }
+
+
+
+    /* ---- 搜索栏 ---- */
+    .search-bar-wrap {
+      display: flex; align-items: center;
+      background: #fff; border: 1.5px solid #e2e8f0; border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(15,23,42,.06); overflow: hidden;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .search-bar-wrap:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 4px 20px rgba(22,119,255,.14);
+    }
+    .search-scope-select {
+      height: 50px; padding: 0 14px; border: 0;
+      border-right: 1.5px solid #e2e8f0; background: #f8fafc;
+      color: var(--text); font-size: 14px; outline: none; cursor: pointer; min-width: 118px;
+    }
+    .search-bar-input {
+      flex: 1; height: 50px; border: 0; padding: 0 18px;
+      font-size: 15px; outline: none; color: var(--text); background: transparent;
+    }
+    .search-bar-input::placeholder { color: #94a3b8; }
+    .search-bar-btn {
+      width: 50px; height: 50px; border: 0; background: var(--primary);
+      color: #fff; font-size: 22px; cursor: pointer; transition: background .2s; flex-shrink: 0;
+    }
+    .search-bar-btn:hover { background: var(--primary-deep); }
+    /* 搜索提示词 */
+    .search-hints {
+      display: flex; align-items: center; gap: 8px; margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .search-hint-label { font-size: 12px; color: var(--muted); }
+    .hint-chip {
+      display: inline-flex; align-items: center; height: 26px; padding: 0 11px;
+      border-radius: 999px; font-size: 12px; background: #fff;
+      border: 1px solid #e2e8f0; color: var(--text); cursor: pointer;
+      transition: .15s;
+    }
+    .hint-chip:hover { border-color: var(--primary); color: var(--primary); background: #eef4ff; }
+
+    /* ---- 内容区（搜索结果 / 最近在看 切换） ---- */
+    .content-area { position: relative; }
+
+    /* 默认态：最近在看 */
+    .recent-section { }
+    .recent-list { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; position: relative; }
+    .recent-card { padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+    .tag {
+      display: inline-flex; align-items: center; height: 22px; padding: 0 9px;
+      border-radius: 999px; font-size: 11px; font-weight: 600;
+      background: #eef4ff; color: var(--primary);
+    }
+    .tag.hazard { background: #fff7ed; color: #ea580c; }
+    .tag.policy { background: #f0fdf4; color: #16a34a; }
+    .tag.gov    { background: #eff6ff; color: #1d4ed8; }
+    .tag.latest { background: #fdf4ff; color: #9333ea; }
+    .item-title { font-weight: 600; font-size: 14px; line-height: 1.5; }
+    .recent-meta { display: flex; gap: 10px; color: var(--muted); font-size: 12px; }
+    .primary-btn {
+      width: fit-content; border: 0; border-radius: 9px; cursor: pointer;
+      background: #eaf3ff; color: var(--primary); padding: 8px 14px;
+      font-size: 13px; transition: .2s;
+    }
+    .primary-btn:hover { background: #d6eaff; }
+
+    /* 搜索结果态 */
+    .search-result-section { display: none; }
+    .search-result-section.active { display: block; }
+    .recent-section.hidden { display: none; }
+
+    .sr-header {
+      display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;
+    }
+    .sr-header-left { display: flex; align-items: center; gap: 12px; }
+    .sr-kw-display { font-size: 18px; font-weight: 600; }
+    .sr-kw-display span { color: var(--primary); }
+    .sr-total { font-size: 13px; color: var(--muted); }
+    .sr-clear { border: 0; background: none; color: var(--muted); font-size: 13px; cursor: pointer; text-decoration: underline; }
+    .sr-clear:hover { color: var(--text); }
+
+    .sr-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--line); margin-bottom: 16px; }
+    .sr-tab {
+      padding: 10px 18px; font-size: 14px; cursor: pointer;
+      color: var(--muted); border-bottom: 2px solid transparent;
+      transition: .15s; white-space: nowrap;
+    }
+    .sr-tab.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 600; }
+    .sr-tab .sr-count {
+      display: inline-block; margin-left: 5px; font-size: 11px;
+      background: #eef4ff; color: var(--primary); border-radius: 999px;
+      padding: 1px 7px; font-weight: 600;
+    }
+    .sr-tab.active .sr-count { background: var(--primary); color: #fff; }
+
+    .sr-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+    .sr-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 16px; border-radius: 12px;
+      border: 1px solid #f0f4f9; cursor: pointer; transition: .15s;
+      background: #fff;
+    }
+    .sr-item:hover { background: #f5f9ff; border-color: #cfe0ff; box-shadow: 0 4px 14px rgba(22,119,255,.08); }
+    .sr-item-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      display: grid; place-items: center; font-size: 18px; flex-shrink: 0;
+    }
+    .sr-item-body { flex: 1; min-width: 0; }
+    .sr-item-title { font-weight: 600; font-size: 14px; line-height: 1.4; margin-bottom: 4px; }
+    .sr-item-title mark { background: #fef3c7; color: #92400e; padding: 0 2px; border-radius: 3px; }
+    .sr-item-excerpt { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 5px;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .sr-item-excerpt mark { background: #fef9c3; color: #713f12; padding: 0 1px; }
+    .sr-item-meta { font-size: 12px; color: #94a3b8; }
+    .sr-item-tag {
+      flex-shrink: 0; display: inline-flex; align-items: center; height: 22px;
+      padding: 0 9px; border-radius: 999px; font-size: 11px; font-weight: 600;
+    }
+    .sr-empty { text-align: center; padding: 48px 0; color: var(--muted); font-size: 14px; }
+    .sr-empty-icon { font-size: 36px; margin-bottom: 12px; }
+    .sr-footer-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line);
+    }
+    .sr-footer-bar span { font-size: 13px; color: var(--muted); }
+    .sr-view-all {
+      border: 0; border-radius: 9px; cursor: pointer;
+      background: #eef4ff; color: var(--primary); padding: 8px 16px;
+      font-size: 13px; font-weight: 600; transition: .2s;
+    }
+    .sr-view-all:hover { background: #d6eaff; }
+
+    /* ---- Toast ---- */
+    .toast {
+      position: fixed; right: 24px; bottom: 24px; min-width: 260px;
+      background: rgba(15,23,42,.92); color: #fff; padding: 12px 16px;
+      border-radius: 12px; box-shadow: 0 12px 30px rgba(15,23,42,.22);
+      opacity: 0; pointer-events: none; transform: translateY(8px);
+      transition: .22s ease; font-size: 14px; z-index: 999;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ── 打点备注系统（墨刀风格） ── */
+    .dev-mark {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      margin-left: 4px;
+      cursor: pointer;
+      vertical-align: middle;
+    }
+    .dev-mark-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fde68a;
+      border: 1.5px solid #f59e0b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      color: #92400e;
+      font-weight: 700;
+      transition: transform 0.15s, box-shadow 0.15s;
+      user-select: none;
+    }
+    .dev-mark:hover .dev-mark-dot {
+      transform: scale(1.2);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+    }
+    .dev-mark-tip {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.6;
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      min-width: 180px;
+      max-width: 320px;
+      white-space: normal;
+      text-align: left;
+    }
+    .dev-mark-tip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #1f2937;
+    }
+    .dev-mark:hover .dev-mark-tip {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .dev-mark-tip b {
+      color: #fde68a;
+    }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+
+  <!-- 顶部一级导航 -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#3b82f6"/>
+          <path d="M2 17L12 22L22 17" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12L12 17L22 12" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1 class="brand-name">格瑞曼</h1>
+    </div>
+    <nav class="top-nav">
+      <a class="nav-item" href="#">
+        <span class="nav-item-icon">◎</span>
+        <span class="nav-item-text">工作台</span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-item-icon">◎</span>
+        <span class="nav-item-text">迈灵大模型</span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-item-icon">⚙</span>
+        <span class="nav-item-text">安全管理</span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-item-icon">⊞</span>
+        <span class="nav-item-text">生产管理</span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-item-icon">◎</span>
+        <span class="nav-item-text">设备管理</span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-item-icon">◎</span>
+        <span class="nav-item-text">胶带管理</span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-item-icon">◎</span>
+        <span class="nav-item-text">矿山管理</span>
+      </a>
+      <a class="nav-item active" href="legal-regulations-pc-home.html">
+        <span class="nav-item-icon">⚖</span>
+        <span class="nav-item-text">法律法规库</span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-item-icon">◎</span>
+        <span class="nav-item-text">系统管理</span>
+      </a>
+    </nav>
+    <div class="top-actions">
+      <div class="top-user">
+        <div class="top-user-avatar">L</div>
+        <span class="top-user-name">李安全</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 首页不需要左侧菜单，直接全屏显示 -->
+  <div class="content-wrapper" style="padding:20px 24px;">
+    <div class="layout">
+
+    <!-- Hero 三列布局 -->
+    <section class="hero card">
+
+      <!-- 左列：更新提醒 -->
+      <div class="hero-left-col">
+        <h3 class="hero-col-title">政策更新提醒</h3>
+        <div class="hero-update">
+          <div class="hero-update-header">
+            <div class="hero-update-icon">📢</div>
+            <div class="hero-update-text">
+              <h4>法规动态</h4>
+              <p>本周新增 12 条法规更新，包含国家矿山安全监察局最新发布的技术规范</p>
+            </div>
+          </div>
+          <button class="ghost-btn" data-action="view-update">查看详情 →</button>
+        </div>
+      </div>
+
+      <!-- 中列：3个统计数字（横向并排） -->
+      <div class="hero-middle-col">
+        <h3 class="hero-col-title">数据概览</h3>
+        <div class="stats-row">
+          <div class="stat-tile-icon-horizontal">
+            <div class="stat-icon">🗂️</div>
+            <span>文件总量
+              <span class="dev-mark"><span class="dev-mark-dot">?</span><span class="dev-mark-tip"><b>数据来源：</b>法律法规库中收录的文档总数。</span></span>
+            </span>
+            <strong>1,286</strong>
+          </div>
+          <div class="stat-tile-icon-horizontal">
+            <div class="stat-icon">🆕</div>
+            <span>最新发布
+              <span class="dev-mark"><span class="dev-mark-dot">?</span><span class="dev-mark-tip"><b>数据来源：</b>近30天内发布的法规文件数量，按正式发布日期统计。</span></span>
+            </span>
+            <strong>28</strong>
+          </div>
+          <div class="stat-tile-icon-horizontal">
+            <div class="stat-icon">🔍</div>
+            <span>隐患库
+              <span class="dev-mark"><span class="dev-mark-dot">?</span><span class="dev-mark-tip"><b>数据来源：</b>AI训练产生的隐患总数，包含各风险等级。四大风险等级数量之和应等于隐患总量。</span></span>
+            </span>
+            <strong>96</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右列：快捷入口 -->
+      <div class="hero-right-col">
+        <h3 class="hero-col-title">快捷入口</h3>
+        <div class="hero-quick-grid">
+          <div class="hero-quick-item" onclick="window.location.href='legal-regulations-pc-list.html'">
+            <div class="hero-quick-icon" style="background:linear-gradient(135deg,#1677ff,#5aa0ff)">⚖️</div>
+            <div class="hero-quick-text"><h4>法律法规</h4></div>
+          </div>
+          <div class="hero-quick-item" onclick="window.location.href='legal-regulations-pc-hazard-library.html'">
+            <div class="hero-quick-icon" style="background:linear-gradient(135deg,#f97316,#fb923c)">🔍</div>
+            <div class="hero-quick-text"><h4>隐患库</h4></div>
+          </div>
+          <div class="hero-quick-item" onclick="window.location.href='legal-regulations-pc-latest-release.html'">
+            <div class="hero-quick-icon" style="background:linear-gradient(135deg,#e11d48,#fb7185)">🆕</div>
+            <div class="hero-quick-text"><h4>最新发布</h4></div>
+          </div>
+          <div class="hero-quick-item" onclick="window.location.href='legal-regulations-pc-ai-ask.html'">
+            <div class="hero-quick-icon" style="background:linear-gradient(135deg,#7c3aed,#a78bfa)">🤖</div>
+            <div class="hero-quick-text"><h4>法规问答</h4></div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+
+
+    <!-- 搜索栏 -->
+    <section id="searchSection">
+      <div class="search-bar-wrap">
+        <select class="search-scope-select" id="searchScope">
+          <option value="all">全部内容</option>
+          <option value="law">法律法规</option>
+          <option value="hazard">隐患库</option>
+        </select>
+        <input class="search-bar-input" id="searchInput" type="text" placeholder="搜索法律法规、条例、规章、隐患、政策...">
+        <button class="search-bar-btn" id="searchBtn" type="button">⌕</button>
+      </div>
+      <div class="search-hints">
+        <span class="search-hint-label">热门搜索：
+          <span class="dev-mark"><span class="dev-mark-dot">?</span><span class="dev-mark-tip"><b>数据逻辑：</b>热门搜索词基于全库搜索行为统计，展示用户高频检索的关键词，支持快速点击发起检索。</span></span>
+        </span>
+        <span class="hint-chip" data-kw="安全规程">安全规程</span>
+        <span class="hint-chip" data-kw="重大隐患">重大隐患</span>
+        <span class="hint-chip" data-kw="许可证">许可证</span>
+        <span class="hint-chip" data-kw="瓦斯">瓦斯</span>
+        <span class="hint-chip" data-kw="通风">通风</span>
+        <span class="hint-chip" data-kw="爆破">爆破</span>
+        <span class="hint-chip" data-kw="矿山安全法">矿山安全法</span>
+      </div>
+    </section>
+
+    <!-- 内容区：默认=最近在看，搜索后=搜索结果 -->
+    <div class="content-area">
+
+      <!-- 默认：最近在看 -->
+      <section class="recent-section" id="recentSection">
+        <div class="section-head">
+          <h3>最近在看
+            <span class="dev-mark"><span class="dev-mark-dot">?</span><span class="dev-mark-tip"><b>数据逻辑：</b>• 数据来源：当前登录用户的个人浏览历史记录<br>• 排序规则：按最近访问时间倒序排列（最新的在前）<br>• 数量上限：最多展示 10 条，默认取前 10 条<br>• 记录写入：用户进入任意法规/隐患详情页时，自动写入一条浏览历史</span></span>
+          </h3>
+        </div>
+        <div class="recent-list" id="recentList"><span class="dev-mark" style="position:absolute;margin:4px 0 0 -8px;"><span class="dev-mark-dot">?</span><span class="dev-mark-tip"><b>接口说明：</b>• 请求方式：GET<br>• 请求路径：/api/history/recent<br>• 请求参数：limit（默认10）<br>• 返回字段：list[]{id, type, title, org, viewAt}，按 viewAt 降序</span></span>
+          <div class="recent-card card">
+            <div class="tag">法律法规</div>
+            <div class="item-title">金属非金属地下矿山安全规程</div>
+            <div class="recent-meta"><span>今天 10:26</span><span>国家标准 GB 16423-2020</span></div>
+            <button class="primary-btn" onclick="window.location.href='legal-regulations-pc-list.html'">查看详情<span class="dev-mark"><span class="dev-mark-dot">?</span><span class="dev-mark-tip"><b>交互说明：</b>跳转至法律法规列表详情页<br><b>历史写入：</b>跳转时写入用户浏览历史<br>• 接口：POST /api/history/add<br>• 参数：{type:"law", id, title, viewAt}<br><b>列表页回显：</b>当前文档的浏览时间更新为最新</span></span></button>
+          </div>
+          <div class="recent-card card">
+            <div class="tag hazard">隐患库</div>
+            <div class="item-title">地下矿山重大事故隐患判定标准</div>
+            <div class="recent-meta"><span>今天 09:12</span><span>应急管理部</span></div>
+            <button class="primary-btn" onclick="window.location.href='legal-regulations-pc-hazard-library.html'">查看详情<span class="dev-mark"><span class="dev-mark-dot">?</span><span class="dev-mark-tip"><b>交互说明：</b>跳转至隐患库详情页<br><b>历史写入：</b>跳转时写入用户浏览历史<br>• 接口：POST /api/history/add<br>• 参数：{type:"hazard", id, title, viewAt}<br><b>列表页回显：</b>当前文档的浏览时间更新为最新</span></span></button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 搜索结果区 -->
+      <section class="search-result-section" id="searchResultSection">
+        <div class="sr-header">
+          <div class="sr-header-left">
+            <div class="sr-kw-display">搜索 "<span id="srKwDisplay"></span>" 的结果</div>
+            <div class="sr-total" id="srTotal"></div>
+          </div>
+          <button class="sr-clear" id="srClear">✕ 清除搜索</button>
+        </div>
+        <div class="sr-tabs" id="srTabs">
+          <div class="sr-tab active" data-cat="all">全部 <span class="sr-count" id="countAll">0</span></div>
+          <div class="sr-tab" data-cat="law">法律法规 <span class="sr-count" id="countLaw">0</span></div>
+          <div class="sr-tab" data-cat="hazard">隐患库 <span class="sr-count" id="countHazard">0</span></div>
+        </div>
+        <div class="sr-grid" id="srGrid"></div>
+        <div class="sr-footer-bar">
+          <span id="srFooterInfo"></span>
+          <button class="sr-view-all" id="srViewAll">查看全部结果 →</button>
+        </div>
+      </section>
+
+    </div><!-- /content-area -->
+
+    </div><!-- /layout -->
+    </main><!-- /content-wrapper -->
+  </div><!-- /main-container -->
+</div><!-- /app-layout -->
+</div><!-- /app -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ====================== 模拟数据 ====================== */
+const MOCK_DATA = [
+  // ---- 法律法规 ----
+  {
+    cat:"law", icon:"📘", tagText:"法律法规", tagColor:"#eef4ff", textColor:"#1677ff",
+    href:"legal-regulations-pc-list.html",
+    title:"金属非金属地下矿山安全规程",
+    excerpt:"本规程适用于地下开采的金属非金属矿山，规定了安全生产的基本要求，包括井下通风、照明、支护、爆破、提升运输及防治水等各方面的安全规定。",
+    meta:"国家标准 GB 16423-2020 · 2024-01-15 · 812 条条款"
+  },
+  {
+    cat:"law", icon:"📘", tagText:"法律法规", tagColor:"#eef4ff", textColor:"#1677ff",
+    href:"legal-regulations-pc-list.html",
+    title:"矿山安全法",
+    excerpt:"矿山安全法是规范矿山安全生产的基本法律，明确矿山企业、矿山主管部门及监察机构的职责，对矿山建设、开采、安全设施及事故处理作出了具体规定。",
+    meta:"全国人民代表大会 · 2023-07-01 修订 · 64 条条款"
+  },
+  {
+    cat:"law", icon:"📘", tagText:"法律法规", tagColor:"#eef4ff", textColor:"#1677ff",
+    href:"legal-regulations-pc-list.html",
+    title:"矿山安全生产许可证管理规定",
+    excerpt:"本规定对申请矿山安全生产许可证的条件、程序、证书有效期及动态监管等作出详细规定，是矿山企业合法经营的重要前提。",
+    meta:"应急管理部令 第 5 号 · 2023-08-20 · 45 条条款"
+  },
+  {
+    cat:"law", icon:"📘", tagText:"法律法规", tagColor:"#eef4ff", textColor:"#1677ff",
+    href:"legal-regulations-pc-list.html",
+    title:"非煤矿矿山企业安全生产许可证实施办法",
+    excerpt:"本办法规定了非煤矿矿山企业取得安全生产许可证需满足的技术条件，包括安全管理机构设立、安全规程制定及特种作业人员持证上岗等要求。",
+    meta:"国家安全生产监督管理总局 · 2022-11-01 · 38 条条款"
+  },
+  {
+    cat:"law", icon:"📘", tagText:"法律法规", tagColor:"#eef4ff", textColor:"#1677ff",
+    href:"legal-regulations-pc-list.html",
+    title:"地下矿山重大事故隐患认定与治理规程",
+    excerpt:"规定了对地下矿山进行重大事故隐患认定的程序和判定标准，以及治理责任、治理期间的安全管控要求，并明确了违规处罚条款。",
+    meta:"国家矿山安全监察局 · 2023-05-10 · 52 条条款"
+  },
+  {
+    cat:"law", icon:"📘", tagText:"法律法规", tagColor:"#eef4ff", textColor:"#1677ff",
+    href:"legal-regulations-pc-list.html",
+    title:"矿山建设安全设施设计审查与竣工验收办法",
+    excerpt:"本办法规范矿山建设项目安全设施"三同时"管理，要求安全设施设计须经审查通过，竣工后须经验收合格方可投入正式生产。",
+    meta:"国家矿山安全监察局 · 2022-03-01 · 40 条条款"
+  },
+  // ---- 隐患库 ----
+  {
+    cat:"hazard", icon:"⚠️", tagText:"隐患库", tagColor:"#fff7ed", textColor:"#ea580c",
+    href:"legal-regulations-pc-hazard-library.html",
+    title:"地下矿山重大事故隐患判定标准",
+    excerpt:"明确了 15 类重大事故隐患的具体判定条件，涵盖通风系统不完善、提升系统缺陷、防治水措施缺失、安全出口不符合要求等核心隐患类型。",
+    meta:"国家矿山安全监察局 · 2022-12-01 · 96 条"
+  },
+  {
+    cat:"hazard", icon:"⚠️", tagText:"隐患库", tagColor:"#fff7ed", textColor:"#ea580c",
+    href:"legal-regulations-pc-hazard-library.html",
+    title:"矿山通风系统安全隐患排查标准",
+    excerpt:"针对井下通风系统的主扇风机性能、风量分配、局部通风及测风管理等环节，列出了 28 项具体隐患排查项目和整改要求。",
+    meta:"应急管理部 · 2023-03-10 · 28 条"
+  },
+  {
+    cat:"hazard", icon:"⚠️", tagText:"隐患库", tagColor:"#fff7ed", textColor:"#ea580c",
+    href:"legal-regulations-pc-hazard-library.html",
+    title:"井下爆破安全隐患识别与处置规范",
+    excerpt:"对爆破器材储存、运输、使用各环节可能存在的安全隐患进行了系统梳理，并规定了隐患识别方法及处置程序，强调盲炮处理安全操作要求。",
+    meta:"国家矿山安全监察局 · 2023-06-15 · 35 条"
+  },
+  {
+    cat:"hazard", icon:"⚠️", tagText:"隐患库", tagColor:"#fff7ed", textColor:"#ea580c",
+    href:"legal-regulations-pc-hazard-library.html",
+    title:"地下矿山防治水安全隐患识别规程",
+    excerpt:"系统列出地下矿山水害预防方面的重大隐患类型，包括水文地质勘查不足、防排水系统缺失、雨季未落实防汛措施等，并提供对应治理建议。",
+    meta:"国家矿山安全监察局 · 2023-09-01 · 31 条"
+  },
+  {
+    cat:"hazard", icon:"⚠️", tagText:"隐患库", tagColor:"#fff7ed", textColor:"#ea580c",
+    href:"legal-regulations-pc-hazard-library.html",
+    title:"矿山提升运输系统安全隐患专项检查规范",
+    excerpt:"对竖井、斜井提升机、箕斗、罐笼、钢丝绳、制动装置及信号系统等关键设备设施提出了 42 条专项检查标准和整改判定依据。",
+    meta:"应急管理部 · 2024-02-20 · 42 条"
+  },
+];
+
+/* ====================== 工具函数 ====================== */
+const toast = document.getElementById("toast");
+function showToast(text) {
+  toast.textContent = text;
+  toast.classList.add("show");
+  clearTimeout(showToast._t);
+  showToast._t = setTimeout(() => toast.classList.remove("show"), 2400);
+}
+
+function hl(text, kw) {
+  if (!kw) return text;
+  return text.replace(new RegExp(kw.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi'), m=>`<mark>${m}</mark>`);
+}
+
+/* ====================== 搜索逻辑 ====================== */
+const searchInput  = document.getElementById("searchInput");
+const searchBtn    = document.getElementById("searchBtn");
+const srGrid       = document.getElementById("srGrid");
+const srTabs       = document.getElementById("srTabs");
+const recentSec    = document.getElementById("recentSection");
+const resultSec    = document.getElementById("searchResultSection");
+let currentCat     = "all";
+let lastKw         = "";
+let allHits        = [];
+
+function getHits(kw, scope) {
+  const kwL = kw.toLowerCase();
+  return MOCK_DATA.filter(d =>
+    (d.title.toLowerCase().includes(kwL) || d.excerpt.toLowerCase().includes(kwL)) &&
+    (scope === "all" || scope === d.cat)
+  );
+}
+
+function updateCounts(hits) {
+  document.getElementById("countAll").textContent    = hits.length;
+  document.getElementById("countLaw").textContent    = hits.filter(d=>d.cat==="law").length;
+  document.getElementById("countHazard").textContent = hits.filter(d=>d.cat==="hazard").length;
+  document.getElementById("countPolicy").textContent = hits.filter(d=>d.cat==="policy").length;
+  document.getElementById("countGov").textContent    = hits.filter(d=>d.cat==="gov").length;
+}
+
+function renderGrid(hits, kw, cat) {
+  const list = cat==="all" ? hits : hits.filter(d=>d.cat===cat);
+  if (list.length === 0) {
+    srGrid.innerHTML = `<div class="sr-empty" style="grid-column:1/-1">
+      <div class="sr-empty-icon">🔍</div>
+      该分类下暂无相关结果，请切换其他分类或修改关键词
+    </div>`;
+    return;
+  }
+  srGrid.innerHTML = list.map(d=>`
+    <div class="sr-item" onclick="window.location.href='${d.href}'">
+      <div class="sr-item-icon" style="background:${d.tagColor}">${d.icon}</div>
+      <div class="sr-item-body">
+        <div class="sr-item-title">${hl(d.title, kw)}</div>
+        <div class="sr-item-excerpt">${hl(d.excerpt, kw)}</div>
+        <div class="sr-item-meta">${d.meta}</div>
+      </div>
+      <span class="sr-item-tag" style="background:${d.tagColor};color:${d.textColor}">${d.tagText}</span>
+    </div>
+  `).join("");
+  document.getElementById("srFooterInfo").textContent =
+    `共找到 ${list.length} 条${cat==="all"?"":` "${document.querySelector(`.sr-tab[data-cat="${cat}"]`)?.textContent.replace(/\d+/,'').trim()}"分类`}相关结果`;
+}
+
+function doSearch(kw) {
+  kw = kw.trim();
+  if (!kw) { clearSearch(); return; }
+  lastKw = kw;
+  currentCat = "all";
+  document.querySelectorAll(".sr-tab").forEach(t=>t.classList.remove("active"));
+  document.querySelector('.sr-tab[data-cat="all"]').classList.add("active");
+
+  const scope = document.getElementById("searchScope").value;
+  allHits = getHits(kw, scope);
+  updateCounts(allHits);
+  document.getElementById("srKwDisplay").textContent = kw;
+  document.getElementById("srTotal").textContent = `共 ${allHits.length} 条结果`;
+  renderGrid(allHits, kw, "all");
+
+  recentSec.classList.add("hidden");
+  resultSec.classList.add("active");
+}
+
+function clearSearch() {
+  searchInput.value = "";
+  lastKw = "";
+  resultSec.classList.remove("active");
+  recentSec.classList.remove("hidden");
+}
+
+searchBtn.addEventListener("click", () => doSearch(searchInput.value));
+searchInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") doSearch(searchInput.value);
+  if (e.key === "Escape") clearSearch();
+});
+searchInput.addEventListener("input", () => {
+  if (searchInput.value.length >= 2) doSearch(searchInput.value);
+});
+document.getElementById("srClear").addEventListener("click", clearSearch);
+
+// Tab 切换
+srTabs.addEventListener("click", e => {
+  const tab = e.target.closest(".sr-tab");
+  if (!tab) return;
+  document.querySelectorAll(".sr-tab").forEach(t=>t.classList.remove("active"));
+  tab.classList.add("active");
+  currentCat = tab.dataset.cat;
+  if (lastKw) renderGrid(allHits, lastKw, currentCat);
+});
+
+// 热门搜索提示词
+document.querySelectorAll(".hint-chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    searchInput.value = chip.dataset.kw;
+    doSearch(chip.dataset.kw);
+    searchInput.focus();
+  });
+});
+
+// 查看全部
+document.getElementById("srViewAll").addEventListener("click", () => {
+  if (lastKw) window.location.href = `legal-regulations-pc-list.html?q=${encodeURIComponent(lastKw)}`;
+});
+
+/* ====================== 通用交互 ====================== */
+document.querySelectorAll("[data-href]").forEach(item => {
+  item.addEventListener("click", () => { window.location.href = item.dataset.href; });
+});
+document.querySelectorAll("[data-action]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const map = {
+      notice: "演示交互：查看消息中心",
+      "recent-more": "演示交互：查看全部最近浏览",
+      "view-update": "演示交互：查看本周政策更新"
+    };
+    showToast(map[btn.dataset.action] || "演示交互");
+  });
+});
+</script>
+</body>
+</html>

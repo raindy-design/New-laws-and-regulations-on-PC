@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>法律法规库 - 最新发布</title>
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --line: #e7edf5;
+      --text: #1f2a37;
+      --muted: #667085;
+      --primary: #1677ff;
+      --primary-weak: #eaf3ff;
+      --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* ── 打点备注系统（墨刀风格） ── */
+    .dev-mark {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      margin-left: 4px;
+      cursor: pointer;
+      vertical-align: middle;
+    }
+    .dev-mark-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fde68a;
+      border: 1.5px solid #f59e0b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      color: #92400e;
+      font-weight: 700;
+      transition: transform 0.15s, box-shadow 0.15s;
+      user-select: none;
+    }
+    .dev-mark:hover .dev-mark-dot {
+      transform: scale(1.2);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+    }
+    .dev-mark-tip {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.6;
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      min-width: 180px;
+      max-width: 320px;
+      white-space: normal;
+      text-align: left;
+    }
+    .dev-mark-tip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #1f2937;
+    }
+    .dev-mark:hover .dev-mark-tip {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .dev-mark-tip b {
+      color: #fde68a;
+    }
+
+    /* ---- 整体布局 ---- */
+    .app-layout { display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* ---- 顶部一级导航（深蓝色） ---- */
+    .topbar {
+      height: 56px;
+      background: #1f3a8a;
+      display: flex; align-items: center;
+      padding: 0; position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 12px rgba(26,54,93,.25);
+      min-width: 1200px;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; padding: 0 20px 0 16px; }
+    .brand-icon {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: #fff; display: flex; align-items: center; justify-content: center;
+    }
+    .brand-icon svg { width: 20px; height: 20px; }
+    .brand-name { font-size: 16px; font-weight: 600; color: #fff; margin: 0; }
+
+    /* 一级菜单 */
+    .top-nav { display: flex; align-items: center; flex: 1; margin-left: 8px; }
+    .nav-item {
+      height: 56px; padding: 0 16px; display: flex; align-items: center;
+      gap: 7px; color: rgba(255,255,255,.8); font-size: 13px;
+      text-decoration: none; transition: .15s; position: relative;
+      border-radius: 8px; margin: 0 2px; background: transparent; border: 0; cursor: pointer;
+    }
+    .nav-item:hover { color: #fff; background: rgba(255,255,255,.1); }
+    .nav-item.active { color: #fff; background: #3b82f6; }
+    .nav-item-icon { font-size: 15px; width: 18px; text-align: center; }
+    .nav-item-text { font-weight: 500; }
+
+    .top-actions { display: flex; align-items: center; gap: 10px; padding: 0 20px 0 0; }
+    .top-user {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 12px 6px 6px; border-radius: 24px;
+      background: rgba(255,255,255,.12); cursor: pointer; transition: .15s;
+    }
+    .top-user:hover { background: rgba(255,255,255,.2); }
+    .top-user-avatar {
+      width: 26px; height: 26px; border-radius: 50%;
+      background: #60a5fa; display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 11px; font-weight: 700;
+    }
+    .top-user-name { font-size: 12px; color: #fff; font-weight: 500; }
+
+    /* ---- 主容器 ---- */
+    .main-container { display: flex; flex: 1; }
+
+    /* 左侧二级菜单 */
+    .sidebar {
+      width: 200px; background: #fff;
+      border-right: 1px solid #e2e8f0; padding: 0; flex-shrink: 0;
+    }
+    .menu-title {
+      padding: 16px 16px 12px;
+      font-size: 14px; font-weight: 600;
+      color: #1f2a37; text-transform: none; letter-spacing: 0;
+    }
+    .menu-item {
+      display: flex; align-items: center; gap: 10px;
+      margin: 0 8px 2px;
+      padding: 10px 12px; font-size: 13px; color: #475569;
+      text-decoration: none; transition: .15s; cursor: pointer;
+      border-left: 3px solid transparent;
+      border-radius: 6px;
+    }
+    .menu-item:hover { background: #f8fafc; color: #344054; }
+    .menu-item.active { background: #eff6ff; color: #1d4ed8; border-left-color: #3b82f6; font-weight: 600; padding-left: 9px; }
+    .menu-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    /* 右侧主内容 */
+    .main { flex: 1; padding: 20px 24px; overflow-y: auto; }
+
+    .btn {
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 12px;
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-line {
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 12px;
+      background: var(--primary-weak);
+      color: var(--primary);
+    }
+
+    .avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #dbeafe;
+      color: #0f5ed7;
+      font-weight: 700;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 24px;
+      padding: 24px;
+    }
+
+    .menu {
+      display: grid;
+      gap: 8px;
+    }
+
+    .release-menu-item {
+      height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 14px;
+      border-radius: 14px;
+      color: #344054;
+      text-decoration: none;
+    }
+
+    .main {
+      display: grid;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .hero {
+      padding: 24px;
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at top right, rgba(22,119,255,.1), transparent 25%),
+        linear-gradient(135deg, #ffffff, #f8fbff);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+    }
+
+    .hero h2 {
+      margin: 12px 0 8px;
+      font-size: 34px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .search-panel {
+      padding: 18px 20px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .search-row {
+      display: flex;
+      gap: 12px;
+    }
+
+    .search-row input {
+      flex: 1;
+      height: 46px;
+      border: 1px solid var(--line);
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 0 16px;
+      outline: none;
+      font-size: 14px;
+    }
+    .search-row .btn {
+      height: 40px;
+      padding: 0 20px;
+      border-radius: 10px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: .15s;
+    }
+    .search-row .btn:hover {
+      background: #0f5ed7;
+    }
+    .search-row .btn-line {
+      height: 40px;
+      padding: 0 16px;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--muted);
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      transition: .15s;
+    }
+    .search-row .btn-line:hover {
+      color: var(--text);
+      background: #f1f5f9;
+    }
+
+    .timeline-group {
+      display: grid;
+      gap: 16px;
+    }
+
+    .group-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .count-badge {
+      min-width: 44px;
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: #eef2f7;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 18px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .timeline::before {
+      content: "";
+      position: absolute;
+      left: 2px;
+      top: 2px;
+      bottom: 2px;
+      width: 2px;
+      background: #dbe5f0;
+    }
+
+    .release-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .release-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 22px;
+      display: grid;
+      gap: 14px;
+      min-height: 310px;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.45;
+    }
+
+    .type-badge {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      background: #f2f4f7;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .summary {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.9;
+      min-height: 96px;
+    }
+
+    .tags {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      height: 32px;
+      padding: 0 12px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #e4e7ec;
+      color: #344054;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 16px;
+      color: var(--muted);
+      font-size: 13px;
+      padding-top: 10px;
+      border-top: 1px solid #edf2f7;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: auto;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      height: 38px;
+      padding: 0 14px;
+      border-radius: 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+    }
+
+    .action-btn.primary {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+
+    /* ── 打点备注系统（墨刀风格） ── */
+    .dev-mark {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      margin-left: 4px;
+      cursor: pointer;
+      vertical-align: middle;
+    }
+    .dev-mark-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #fde68a;
+      border: 1.5px solid #f59e0b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      color: #92400e;
+      font-weight: 700;
+      transition: transform 0.15s, box-shadow 0.15s;
+      user-select: none;
+    }
+    .dev-mark:hover .dev-mark-dot {
+      transform: scale(1.2);
+      box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+    }
+    .dev-mark-tip {
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 12px;
+      line-height: 1.6;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      z-index: 1000;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.15s;
+      min-width: 180px;
+      max-width: 320px;
+      white-space: normal;
+      text-align: left;
+    }
+    .dev-mark-tip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #1f2937;
+    }
+    .dev-mark:hover .dev-mark-tip {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .dev-mark-tip b {
+      color: #fde68a;
+    }
+
+    </style>
+</head>
+<body>
+<div class="app-layout">
+  <!-- 顶部一级导航 -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="#3b82f6"/>
+          <path d="M2 17L12 22L22 17" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12L12 17L22 12" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h1 class="brand-name">格瑞曼</h1>
+    </div>
+    <nav class="top-nav">
+      <a class="nav-item" href="#">
+        <span class="nav-item-icon">◎</span>
+        <span class="nav-item-text">工作台</span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-item-icon">◎</span>
+        <span class="nav-item-text">迈灵大模型</span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-item-icon">⚙</span>
+        <span class="nav-item-text">安全管理</span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-item-icon">⊞</span>
+        <span class="nav-item-text">生产管理</span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-item-icon">◎</span>
+        <span class="nav-item-text">设备管理</span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-item-icon">◎</span>
+        <span class="nav-item-text">胶带管理</span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-item-icon">◎</span>
+        <span class="nav-item-text">矿山管理</span>
+      </a>
+      <a class="nav-item active" href="legal-regulations-pc-home.html">
+        <span class="nav-item-icon">⚖</span>
+        <span class="nav-item-text">法律法规库</span>
+      </a>
+      <a class="nav-item" href="#">
+        <span class="nav-item-icon">◎</span>
+        <span class="nav-item-text">系统管理</span>
+      </a>
+    </nav>
+    <div class="top-actions">
+      <div class="top-user">
+        <div class="top-user-avatar">L</div>
+        <span class="top-user-name">李安全</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <!-- 左侧二级菜单 -->
+    <aside class="sidebar">
+      <div class="menu-group">
+        <div class="menu-title">法律法规库</div>
+        <a href="legal-regulations-pc-list.html" class="menu-item">
+          <span class="menu-icon">📋</span>法律法规
+        </a>
+        <a href="legal-regulations-pc-hazard-library.html" class="menu-item">
+          <span class="menu-icon">⚠️</span>隐患库
+        </a>
+        <a href="legal-regulations-pc-latest-release.html" class="menu-item active">
+          <span class="menu-icon">🆕</span>最新发布
+        </a>
+        <a href="legal-regulations-pc-ai-ask.html" class="menu-item">
+          <span class="menu-icon">💬</span>法规问答
+        </a>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="hero">
+        <div style="font-size:13px;color:#667085;">首页 / 最新发布 / 时间顺序浏览</div>
+        <h2>最新发布
+          <span class="dev-mark" style="margin-left:4px;"><span class="dev-mark-dot">?</span><span class="dev-mark-tip"><b>通用说明：</b>• 时间分组：按文件正式发布日期<br>• 发布时间：取自文件正式日期，非入库时间<br>• 浏览量：客户部署环境的访问次数</span></span>
+        </h2>
+        <p>按时间顺序查看所有最新发布的法律法规、行政法规和部门规章，帮助地下矿山用户及时掌握新增内容与更新动态。</p>
+      </section>
+
+      <!--
+        搜索筛选组件 - 交互逻辑：
+        1. 输入关键字点击搜索，按标题/文号/关键词匹配最新发布记录
+        2. 重置：清空搜索框，显示全部记录
+      -->
+      <section class="search-panel">
+        <div class="search-row">
+          <input id="searchInput" type="text" placeholder="搜索最新发布，例如：专项整治、城市安全、危险化学品">
+          <button class="btn" id="searchBtn">搜索<span class="dev-mark"><span class="dev-mark-dot">?</span><span class="dev-mark-tip"><b>接口说明：</b>• 请求方式：GET/POST<br>• 请求路径：/api/regulations/latest/search<br>• 请求参数：keyword, page, pageSize<br>• 返回字段：total, list[]{id, title, type, org, publishDate, viewCount, summary}</span></span></button>
+        </div>
+      </section>
+
+      <section class="timeline-group">
+        <div class="group-head">
+          <span>📅 2024年3月</span>
+          <span class="count-badge">3 条</span>
+        </div>
+        <div class="timeline">
+          <div class="release-grid">
+            <article class="release-card">
+              <div class="card-top">
+                <h3 class="card-title">金属非金属地下矿山安全规程</h3>
+                <span class="type-badge">部门规章</span>
+              </div>
+              <div class="summary">规定了地下矿山生产系统的安全要求，涵盖通风、防火、防治水、机电运输等关键环节的管理规定和操作标准。</div>
+              <div class="meta">
+                <span>国家市场监督管理总局</span>
+                <span>2024-03-20</span>
+                <span>18,500 浏览</span>
+              </div>
+              <div class="card-actions">
+                <button class="action-btn download-btn">下载文件<span class="dev-mark"><span class="dev-mark-dot">?</span><span class="dev-mark-tip"><b>接口说明：</b>• 请求方式：GET<br>• 请求路径：/api/regulations/{id}/download<br>• 返回：文件流（PDF/WORD）</span></span></button>
+                <button class="action-btn primary" onclick="window.location.href='legal-regulations-pc-document-detail.html'">查看详情<span class="dev-mark"><span class="dev-mark-dot">?</span><span class="dev-mark-tip"><b>交互说明：</b>跳转到详情页<br><b>路由参数：</b>/detail/:id<br><b>详情接口：</b>GET /api/regulations/{id}</span></span></button>
+              </div>
+            </article>
+
+            <article class="release-card">
+              <div class="card-top">
+                <h3 class="card-title">矿山安全规程 第1部分：地下矿山</h3>
+                <span class="type-badge">部门规章</span>
+              </div>
+              <div class="summary">明确了地下矿山井下通风、排水、供电、提升运输等主要系统设施的安全技术要求，是矿山设计和生产的重要依据。</div>
+              <div class="meta">
+                <span>应急管理部</span>
+                <span>2024-03-18</span>
+                <span>16,200 浏览</span>
+              </div>
+              <div class="card-actions">
+                <button class="action-btn download-btn">下载文件</button>
+                <button class="action-btn primary" onclick="window.location.href='legal-regulations-pc-document-detail.html'">查看详情</button>
+              </div>
+            </article>
+
+            <article class="release-card">
+              <div class="card-top">
+                <h3 class="card-title">矿山生产安全事故应急预案编制导则</h3>
+                <span class="type-badge">部门规章</span>
+              </div>
+              <div class="summary">规范了矿山生产安全事故应急预案的编制程序、主要内容和动态管理要求，适用于地下矿山和露天矿山企业。</div>
+              <div class="meta">
+                <span>应急管理部</span>
+                <span>2024-03-15</span>
+                <span>14,800 浏览</span>
+              </div>
+              <div class="card-actions">
+                <button class="action-btn download-btn">下载文件</button>
+                <button class="action-btn primary" onclick="window.location.href='legal-regulations-pc-document-detail.html'">查看详情</button>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="timeline-group">
+        <div class="group-head">
+          <span>📅 2023年3月</span>
+          <span class="count-badge">1 条</span>
+        </div>
+        <div class="timeline">
+          <div class="release-grid" style="grid-template-columns:repeat(1, minmax(0, 1fr));max-width:580px;">
+            <article class="release-card">
+              <div class="card-top">
+                <h3 class="card-title">危险化学品安全管理条例</h3>
+                <span class="type-badge">行政法规</span>
+              </div>
+              <div class="summary">围绕危险化学品生产、储存、经营、运输、使用和处置等环节明确安全管理责任与监管要求。</div>
+              <div class="meta">
+                <span>国务院</span>
+                <span>2023-03-12</span>
+                <span>13,600 浏览</span>
+              </div>
+              <div class="card-actions">
+                <button class="action-btn download-btn">下载文件</button>
+                <button class="action-btn primary" onclick="window.location.href='legal-regulations-pc-document-detail.html'">查看详情</button>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  </div>
+
+  <script>
+    const searchInput = document.getElementById("searchInput");
+    const backdrop=document.getElementById('modalBackdrop'), titleEl=document.getElementById('modalTitle'), textEl=document.getElementById('modalText');
+    function openModal(title,text){titleEl.textContent=title;textEl.textContent=text;backdrop.classList.add('show');}
+    function closeModal(){backdrop.classList.remove('show');}
+    backdrop.addEventListener('click',e=>{if(e.target===backdrop) closeModal();});
+    document.querySelectorAll('[data-modal-title]').forEach(el=>el.addEventListener('click',()=>openModal(el.dataset.modalTitle,el.dataset.modalText)));
+    document.getElementById("searchBtn").addEventListener("click", () => openModal("搜索结果","已根据关键词“" + (searchInput.value.trim() || "专项整治") + "”刷新最新发布列表。"));
+    searchInput.addEventListener("keydown", (e) => { if (e.key === "Enter") openModal("搜索结果","已根据关键词“" + (searchInput.value.trim() || "专项整治") + "”刷新最新发布列表。"); });
+    document.querySelectorAll(".download-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const title = btn.closest(".release-card").querySelector(".card-title").textContent.trim();
+        const blob = new Blob(["发布文件：" + title + "\n状态：示例下载文件\n来源：最新发布"], { type: "text/plain;charset=utf-8" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = title + ".txt";
+        link.click();
+        URL.revokeObjectURL(link.href);
+        openModal("开始下载","《" + title + "》已开始下载。");
+      });
+    });
+  </script>
+</body>
+</html>
